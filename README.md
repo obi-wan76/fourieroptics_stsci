@@ -30,14 +30,34 @@
 
 | Date        | Class #  | Topics
 |:-----------:|:--------:|-------------------------------------------------------------------------|
-|Oct 24       | #1      | Intro, class software, EM waves, scalar field, far field, the Fraunhofer approximation behind Fourier optics.  The Fourier transform.
-|Oct 31       | #2      | Simulating the image plane of a given telescope pupil.  Limits to discrete Fourier transforms: effects of sampling, and finite information input.  Equivalent Width Theorem.
-|Nov 7        | #3      | Matching theory and numerics, PSFs and imaging, asymptotic behavior, apodization,  Nyquist sampling and aliasing, imperfect images, tilt, speckles
+|Oct 24       | #1      | Intro, class software, EM waves, scalar field, far field, the Fraunhofer approximation behind Fourier optics.  The Fourier transform definition.
+|Oct 31       | #2      | (The monochromatic plane wave, the single photon approach).  Limits to discrete Fourier transforms: effects of sampling, and finite information input.  Fourier transform properties (the main theorems), applied to telescopes/imaging (tilts, shifts).  Simulating the image plane of a given telescope pupil.  Pixel scale.  Detector simulation. Polychromatic imaging.   Equivalent Width Theorem.
+|Nov 7        | #3      | Matching theory and numerics, PSFs and imaging, asymptotic behavior, apodization, band-limited functions,  Nyquist sampling and aliasing, imperfect images, tilt, speckles
 |Nov 14       | #4      | Wavefront sensing: focus sweeps, Gerchberg Saxton focus-diverse phase retrieval basics
-|Nov 21       | -       | No class
+|Nov 21       | -       | The Lyot coronagraph, classical & band-limited.  The Four Quadrant phase mask coronagraph.  Sketch of Vortex coronagraph.
 |Nov 28       | #5      |
 |Dec 5        | #6      | 
-|Dec 12       | Back-up      | 
+|Dec 12       | Back-up | 
+
+
+
+### Book, articles, and links
+
+1. The best textbook for the Fourier part is still R.N. Bracewell, **"The Fourier Transform and Its Applications" ** (Third Edition, Mcgraw-Hill, 2000).  This book is unfortunately out of print and has been so for some time. The remaining stock is expensive. The ** pictorial dictionary of Fourier transforms** is on pp. 573-591.
+
+2. "Introduction to Fourier Optics"  by J. W. Goodman, (McGraw-Hill, second edition,
+    1996 (or any other edition) 
+    
+3. "Principles of Optics" M. Born & E. Wolf, 1975 (Pergamon). A new edition of this ancient classic was announced a few years ago. Even the older editions have all the basic material you are likely to need. This book is the bible for physical optics.  I use the 7th edition.
+
+4. ["Interferometry and Synthesis in Radio
+    Astronomy"](http://adsabs.harvard.edu/abs/2017isra.book.....T) A.R.
+    Thompson, J.M. Moran, & G.W. Swenson, (Springer, 2017). This is the bible
+    for the subject as applied to radio astronomy. PDF downloadable via the
+    link above.
+
+5. [Fourier transforms page at NRAO](https://www.cv.nrao.edu/course/astr534/FourierTransforms.html)  From about 2/3 of the way down and on to the end this fairly short page the basic Fourier transform theorems are laid out well.
+   
 
 ###Class 1: Theoretical basis, numerical Fourier machinery
 	
@@ -71,10 +91,19 @@ The concept of the **pupil** (or aperture) plane of an optical system, and its i
 	
 Describing the pupil quantitatively (eg. equation 2 of the above paper).  If you create a numpy array that represents a circular mirror telescope without a secondary obstruction, what are the physical dimensions you assign (in your mind) to this in-memory array --- what physical thing does the numerical array span?  What physical quantity is represented by a number (an element) in this numerical array?
 	
-#### Post-class-1 work	
+#### Post-class-1 and pre-class-2 work	
 
-	
-	Look at and run code/telclass.py
+  
+
+1. Become well-acquainted with the **definition of the convolution** of two functions.
+2. Become familiar with the **Special functions** notation in the class1/BracewellIII_pp91_92SpecialFunctions.pdf file on our repository.
+3. Familiarize yourself with the **basic Fourier theorems** in the [Fourier transforms page at NRAO](https://www.cv.nrao.edu/course/astr534/FourierTransforms.html).
+4. Consider what effect a **lateral shift of the pupil** has on its Fourier transform, i.e. the image plane **complex amplitude**, and what effect it has on the **image plane intensity**.  Write down a simple 1-D theoretical Fourier argument to support your conclusions.
+5. Again, on purely theoretical grounds, what can you do to the pupil cpmplex amplitude to shift the image intensity array off the origin of the image plane?
+
+
+
+Look at and run code/telclass.py
 	
 	See how the matrixDFT object is instantiated, a pupil created, and an image complex amplitude ("field") and its intensity are calculated.
 	
@@ -84,18 +113,12 @@ Describing the pupil quantitatively (eg. equation 2 of the above paper).  If you
 	
 	Do the same with exer2().  How does this show the difference between a detector pixel and a pointwise value of an image?
 	
+	After attempting or succeeding in answering questions 4 & 5 above, run exer3() and exer4() by uncommenting the call to class2() in the last line of telclass.py.
 	
-I will upload a sample program for creating various phase array creation by the end of today (Oct 24) to help you work through the following exercises:
+	
 
-	Create images (fits files) using a 100x100 pupil array with a pupil radius=20.0, focalplane_size=100, focalplane_npix=100, use a non-zero (always real) phase array.  Create image intesity fits files corresponding to the following cases:
 	
-	phase = a non-zero constant - the "reference" on-axis image.
-	
-	phase = a sloped array of the form a*i + b*j (i,j are indices of the array, a and b constants).  Keep one of them (eg b) at zero, vary a till you see images that differ noticeably from the rference image
-	
-	phase = some sinusoidal function (of i only) - a ripple in the "i" direction.  Use ripples with 2, 3, 4, 5 periods across the "active" pupil (its diameter is 50 pixels, since you used radius=25).  Make the amplitude of the sinusoid 0.1, 0.3, 1, and 3 (these are amplitudes in radians of phase)
-	
-	phase = the sum of a ripple in the "i" direction and one in the "j" direction, with amplitudes of e.g. 0.3
+
 	
 
 	
