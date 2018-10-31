@@ -164,6 +164,7 @@ def class2(tdir, cstr):
         os.makedirs(odir)
     exer3(odir)
     exer4(odir)
+    exer5(odir)
 
 def class3(tdir, cstr):
     # create output directory if it does not exist
@@ -184,4 +185,3 @@ if __name__ == "__main__":
 
     class1(topdir,'c1')
     class2(topdir,'c2')
-    #lass3(topdir,'c3')
