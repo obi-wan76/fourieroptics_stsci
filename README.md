@@ -31,13 +31,13 @@
 | Date        | Class #  | Topics
 |:-----------:|:--------:|-------------------------------------------------------------------------|
 |Oct 24       | #1      | Intro, class software, EM waves, scalar field, far field, the Fraunhofer approximation behind Fourier optics.  The Fourier transform definition.
-|Oct 31       | #2      | The monochromatic plane wave, the single photon probability density function meaning of the PSF.  Limits to discrete Fourier transforms: effects of sampling, and finite information input.  Fourier transform properties (the main theorems), applied to telescopes/imaging (tilts, shifts).  Simulating the image plane of a given telescope pupil.  Pixel scale.  Detector simulation. Polychromatic imaging.   The basic Fourier theorems.  The Sampling Theorem.
-|Nov 7        | #3      | Matching theory and numerics,  asymptotic behavior, apodization, band-limited functions,  Nyquist sampling and aliasing, imperfect images, tilt, speckles
-|Nov 14       | #4      | Wavefront sensing: focus sweeps, Gerchberg Saxton focus-diverse phase retrieval basics
-|Nov 21       | -       | The Lyot coronagraph, classical & band-limited.  The Four Quadrant phase mask coronagraph.  Sketch of Vortex coronagraph.
-|Nov 28       | #5      |
-|Dec 5        | #6      | 
-|Dec 12       | Back-up | 
+|Oct 31       | #2      | The monochromatic plane wave, the single photon probability density function meaning of the PSF.  Limits to discrete Fourier transforms: effects of sampling, and finite information input.  Fourier transform properties (the main theorems), applied to telescopes/imaging (tilts, shifts).  Simulating the image plane of a given telescope pupil.
+|Nov 7        | #3      | The Lyot coronagraph.
+|Nov 14       | #4      | Aberrations in Lyot coronagraphs. 
+|Nov 21       | -       | 
+|Nov 28       | #5      | Aberrations in the BLC, Spatially-filtered wavefront sensing
+|Dec 5        | #6      | Wavefront sensing: focus sweeps, Gerchberg Saxton focus-diverse phase retrieval basics
+|Dec 12       | Back-up | Suggestions for topics of relevance welcome
 
 
 
@@ -129,11 +129,63 @@ Look at and run code/telclass.py
 - Simulating the image plane of a given telescope pupil.  Pixel scale.  Detector simulation.
 
 - Polychromatic imaging.  
-	
 
-	
 
-	
+### Class 3 plan
+
+How did I take the photograph in class3/Tilt_in_pupil.jpg?  It is unprocessed.
+
+Understand the details of the Convolution and Similarity theorems in class1/theorms6.pdf.  They will be utilized to understand coronagraphy.  Look at e.g. the effects of convolving one function with another - top hat with a Gaussian curve that is much narrower than the top hat, for example - sketch the result. 
+
+Diffraction-limited stellar coronagraphy [SKMBK2001](https://ui.adsabs.harvard.edu/#abs/2001ApJ...552..397S) especially Section 2.1, Fig. 1 and Fig 2.
+
+Application: Earliest system sketch for GPI in Fig. 9.
+
+
+
+
+### Class 4 prep and in-class work	
+
+Look at these questions individually, think about them and/or attempt them. It could be very helpful for you to get together in groups or subgroups before class 4 and discuss the details amonsgt yourselves.  Some of you have more knowledge of coronagraphs than others, so please share your understanding.
+
+Find the definition of a Band Limited function.  This is used in the perfect [Band-Limited coronagraph](http://iopscience.iop.org/article/10.1086/339625/meta).
+
+Understand how the two graphical derivations in Fig. 2 of the paper [Aberration leak](https://ui.adsabs.harvard.edu/#abs/2005ApJ...634.1416S) work.  One is a classical Lyot coronagraph, the other is a band-limited Lyot coronagraph.  
+
+ - In particular, why is it that to first order, a tilt of the incoming wave (placing the star that needs to be suppressed off-center on the occulting focal plane mask) has no light leak through the coronagraph?
+  - Why is it that a quadratic phase error in pupil - a focus phase error - creates what is in effect a faint (and slightly wider) version of the original non-coronagraphic PSF in the final coronagraphic image plane?  Look at Eq. 13, and Fing. 3 in the [Aberration leak](https://ui.adsabs.harvard.edu/#abs/2005ApJ...634.1416S) paper.
+   
+
+
+### Class 5 prep and in-class work	
+
+
+#### Before class
+
+Low pass and high pass filters in imaging:
+ 
+  - Pupil (stop) filters out **high angular frequency** information in sky image (a.ka. resolution limit).  A finite-sized pupil is a **low pass filter**  A point source is a delta function source in 2D sky angle space (eg RA, Dec).  We only see lower angular frequency components through a finite diameter telescope.
+
+ -  Field stop in an image plane filters out **high spatial frequency** information in pupil. Simulate  Lyot plane intensity with a square hole in the preceding image plane in two cases: send through only three of the Airy rings, or 10 Airy rings).  The field stop is a complement of a Lyot coronagraph's Focal Plane Mask, which lets all high spatial frequency pupil information through but removes the lowest frequencies.
+ 
+Band-limited coronagraph aberrations:
+
+ - Create your own BLC, with a 250x250 pupil array, 100 pixel diameter (not radius) circular pupil inside it, an FPM that is 1 - Jinc^2() where the jinc^2 has its first zero at about the 5th Airy ring of the PSF in the image plane.  Make sure the FPM array iz zero transmission at its center!  FT the FPM*imagefield to the Lyot pupil plane array (another mft.perform() call), and look at the intensity in that Lyot plane **after** you multiply it with a sensible undersized Lyot stop, cutting out the light at the edges of the pupil.
+ 
+ - Also get the final coronagraphic image intensity after one last mft.perform()
+ 
+ - Next, put in a small phase aberratipon into the incoming wavefromt at the entrance pupil.  Put in a tilt, then a parabola centered in the pupil array (i.e. focus), astigmatism, coma, and see what happens in each separate case to the intesity of light in the Lyot pupil.  Make your rms aberration over the active entrance pupil about 0.2 radians (so the first image's Strehl ratio is ~96%), to stay in the small aberration regime.  I put a **Zernike fitting script** that generates a cube of zernikes in the repository - adjust the pupil size in that code to 100 across (match your active pupil), and you can use those slices for your phase.  Check you have your desired phase rms (multiply them by the appropriate constant to ensure that).
+ 
+ Can you reproduce the sort of behavior you see in the  [Aberration leak](https://ui.adsabs.harvard.edu/#abs/2005ApJ...634.1416S) paper?
+ 
+ This is your coronagraphic train - you can make it a Lyot coronagraph by using a 1 - tophat FPM, with the occulting spot about 10 Airy rings in diameter.  You'll have to play with your Lyot stop undersizing to get the Lyot stop effective in this case.
+ 
+ 
+#### In class
+
+The Sampling theorem (Nyquist/Shannon, original stronger theorem by Laplace) (class6/SamplingTheorem.pdf).
+
+Spatially-filtered wavefront sensing, speckle theory (class6/rjaspeckle.pdf)
 	
 
 
