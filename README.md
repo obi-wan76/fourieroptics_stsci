@@ -1,5 +1,5 @@
-## Fourier Optics Classes 1-6: The Basics
-#### Anand Sivaramakrishan, STScI, 2018 Oct-Dec
+## Fourier Optics Classes 1-8: The Basics
+#### Anand Sivaramakrishan, STScI, 2018 Oct - Jan 2019
 
 #### Prerequisites: 
 	astroconda with python 3 on your laptop
@@ -36,9 +36,9 @@
 |Nov 14       | #4      | Aberrations in Lyot coronagraphs. 
 |Nov 21       | -       | 
 |Nov 28       | #5      | Aberrations in the BLC, Spatially-filtered wavefront sensing
-|Dec 5        | #6      | Wavefront sensing: focus sweeps, Gerchberg Saxton focus-diverse phase retrieval basics
-|Dec 12       | Back-up | Suggestions for topics of relevance welcome
-
+|Dec 5        | #6      | Aberrations, BLC
+|Jan 16       | #7      | Wavefront sensing:  Gerchberg Saxton in-focus phase retrieval basics
+|Jan 24       | #8      | Wavefront sensing:  Misell-Gerchberg Saxton focus-diverse phase retrieval basics
 
 
 ### Book, articles, and links
@@ -187,5 +187,77 @@ The Sampling theorem (Nyquist/Shannon, original stronger theorem by Laplace) (cl
 
 Spatially-filtered wavefront sensing, speckle theory (class6/rjaspeckle.pdf)
 	
+	
+### Class 6
+
+We covered BLC 2nd order, Strehl ratio, filter coherence length, something on Zernikes & effect on PSF, Maréchal aproximation for SR, JWST Level 2 80% SR requirement in F200M NIRCAM, 
+
+Requests of WFS next few classes: Gerchberg Saxton, Missell Gerchberg Saxton 
+### Class 7  Gerchberg-Saxton in-focus phase retrieval
+### Basic principles, the ideal case.
+
+** Background **
+
+I did not find any simple textbook explanations for the GS algorithm.  The ones I saw in books describe the algorithm rather abstractly, very heavy on the mathematics.  I wrote up a few latex pdf summary slides on the GS algorithm,  ** class7_Gerchberg-Saxton_Slides2019.pdf ** in our repository.  Please go over them before you do the pre-class exercises.  I point to a single short section of ** Thesis_2012_Osherovich.pdf ** (in the class 7 materials) in these slides.  Skim that briefly first (you might want to read that section after you have done the homework).  After you read the slides you can look through the ** GerchbergSaxton ** class in my ** gerchbergsaxton.py ** code for the class.
+
+I put a few other papers and files in the repository, but they are not mandatory reading.
+
+The GS algorithm starts with image data, and a pupil geometry.  We seed it with an initial guess at the phase over pupil.  It then iterates between pupil and image planes, enforcing the known pupil, and the known image information each time. 
+
+The case I coded here is for monochromatic images, and better-than-Nyquist sampled images.  
+
+The bottom line for us is that the GS algorithm iterates to convergence.  It converges to a pupil phase.  It does not always converge to the correct answer.  Reasons for this are beyond this course.  It is important to start 'close enough' to the correct phase for GS to converge nicely to the correct solution.  
+
+
+** GS Exercises to do before class: **
+
+** gerchbergsaxton.py file nomenclature explanation **
+
+| File name for Example 1   | Description
+|--------------------------:|------------------------------------|
+| gs1__input_img.fits       | Image intensity file (unit power)
+| gs1__input_pup.fits       | Pupil constraint file 
+| gs1__input_truepha.fits   | Phase used to create image
+| gs1__errorint.fits        | Input image - final image
+| gs1__errorpha.fits        | Input phase - measured phase
+| gs1_imgint.fits           | Cube of image intensities
+| gs1_pupint.fits           | Cube of pupil intensities
+| gs1_puppha.fits           | Cube of pupil phases
+
+
+Run the python script gerchbergsaxton.py from the code directory.  It takes no input parameters.  It creates examples of input data, tagged 0-3, and tries to retrieve the input phase.  It uses a __main__ driver to exercise the ** GerchbergSaxton ** class in the same file.  You can use this object to explore other cases if you need to in the future.  It is written for clarity rather than speed, but it runs quickly enough on the examples I created.
+
+** Look at example 0 briefly, but focus your attention on example 3. **
+
+The same phase aberration is used to create the images, with different pupils.  The GS algorithm then tries to find the phase aberrations in each case.  It fails in example 0 but succeeds in the others.  I change the pupil geometry, destroying the symmetry the ** gs0__input_pup.fits ** circular pupil.
+
+** Open question: **  Why is that so?  It may be that if one tries several random pupil phase arrays (between +/- 1.5 radians, i.e. about +/- pi/2) you might get some or many of them to converge to the correct phase.  I have not investigated this particular case.
+
+There's some degeneracy in a symmetric pupil that allows two phase maps to create the same image intensity pattern.  Can you figure out what that is?  Here's the [answer](https://www.osapublishing.org/oe/abstract.cfm?uri=oe-24-14-15506) (in the abstract, and early in the introduction.  Can you demonstrate this to yourself mathematically?  Also look at Figure 3 of this paper.)
+
+The gerchbergsaxton.py script creates noiseless images on an exactly known pixel scale (two things that don't hold for real data!).  We also know the exact pupil geometry (another idealization.  Look at the ** gsN__input*.fits ** files: the pupil shapes, the image data, and the (supposedly unknown) pupil phase that we want to measure from the single in-focus image.  
+
+Examine the way phase slices in ** gsN_puppha.fits **  evolve with iterations (I use a ds9 'movie' of the slices).
+
+Look at the ** gsN_pupint.fits ** intensity slices' evolution, log scale between approx. 1e-9 and 0.1 to see what's happening ** outside the pupil support area **.  Next, use a log scale between 0.9 and 1.1 to see how the ** inside of the pupil support ** behaves.
+
+If you capture the output of the gerchbergsaxton.py script it gives you an iteration-by-iteration account of the way the phase updates evolve.
+
+I stay well below phase-wrapping over 2 pi (a 'technical' problem if it occurs), and avoid asking too much of the GS algorithm (my aberrations are within about quarter of a wave).
+
+Further reading: John Krist on Hubble (focus on comments on non-parametric phase retrieval, GS especially, p4954 in ** Krist & Burrows 1995 Applied Optics ** in the class 7 materials directory).
+  
+[Fienup](http://www2.optics.rochester.edu/workgroups/fienup/Publications.htm)'s papers for background and further details, practical cases, for when you might need them.
+
+
+### Class 8 MGS loop
+
+TBD: 
+Set up defocus exercises, extend GS object into MGS object for class 8
+
+For NIRCam DHS, DFS, NIRISS/NIRcam FICSM, NIRISS GSGS fallback options for coarse, fine phasing, point to papers, TR's & SPIE's. 
+
+
+
 
 
